@@ -135,7 +135,7 @@ void __attribute__((noreturn)) sys_exit(int code)
 }
 
 
-/* ????????? */
+/* 不存在的系统调用 */
 static int sys_nosys(long a0, long a1, long a2, long a3, long a4, long a5, unsigned long n)
 {
     UNUSED(a3);
@@ -156,13 +156,7 @@ static int sys_success(void)
 
 
 
-/*****************************************************
- * 
- * 
- *  _heap_start 和 _heap_end 的关系和作用 ????
- * 
- * ??????
- * ****************************************************/
+/* sys_brk 用于管理堆内存 */
 static size_t sys_brk(size_t pos)
 {
     uintptr_t res = 0;
@@ -191,7 +185,6 @@ static size_t sys_brk(size_t pos)
     if (pos)
     {
         /* 后续调用 */
-
 
         if ((uintptr_t)pos > (uintptr_t)&_heap_end[0])
         {
@@ -252,7 +245,6 @@ static ssize_t sys_write(int file, const void *ptr, size_t len)
     {
         /* Write data */
         /* 未能输出指定长度 且 目标数据不为空指针 */
-        /* 如果需要输出许多 0 ???? */
         while (length-- > 0 && data != NULL) {
             /* 标准输出有效 */
             if (sys_putchar)
@@ -559,7 +551,7 @@ handle_ecall(uintptr_t cause, uintptr_t epc, uintptr_t regs[32], uintptr_t fregs
 
 
 
-/* __attribute__ weak 选项测试 */
+
 uintptr_t __attribute__((weak, alias("handle_ecall")))
 handle_ecall_u(uintptr_t cause, uintptr_t epc, uintptr_t regs[32], uintptr_t fregs[32]);
 
@@ -788,7 +780,7 @@ handle_fault_store(uintptr_t cause, uintptr_t epc, uintptr_t regs[32], uintptr_t
 uintptr_t handle_syscall(uintptr_t cause, uintptr_t epc, uintptr_t regs[32], uintptr_t fregs[32])
 {
 
-    /* ??????????????????????? */
+    /* 系统调用异常处理表 */
     static uintptr_t (* const cause_table[])(uintptr_t cause, uintptr_t epc, uintptr_t regs[32], uintptr_t fregs[32]) =
     {
         [CAUSE_MISALIGNED_FETCH]      = handle_misaligned_fetch,
